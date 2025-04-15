@@ -1,0 +1,7 @@
+# PostgreSQL
+# ------------------------------------------------------------------------------
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+POSTGRES_DB=shopify_sync_backend
+POSTGRES_USER=oPfmBAmGPXIzeYVxhOdIAiKybPpxkLrk
+POSTGRES_PASSWORD=JQh25b7o6OydJNzyMiXpoLQ8n0O4p6Xpt0tz4tUX836uj1vW7kGZMDMgbv30Uwwk
