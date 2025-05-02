@@ -1,4 +1,6 @@
 # ruff: noqa: E501
+import os
+
 from .base import *  # noqa: F403
 from .base import INSTALLED_APPS
 from .base import MIDDLEWARE
@@ -33,18 +35,30 @@ EMAIL_BACKEND = env(
     "DJANGO_EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend",
 )
 
-
-
+#
+#
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'synch_backend',
+#         'USER': 'postgres',
+#         'PASSWORD': 'password',
+#         'HOST': 'localhost',
+#         'PORT': '5432',
+#     }
+# }
+#
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'synch_backend',
-        'USER': 'postgres',
-        'PASSWORD': 'password',
-        'HOST': 'localhost',
-        'PORT': '5432',
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.environ.get("POSTGRES_DB", "shopify_db"),
+        "USER": os.environ.get("POSTGRES_USER", "shopify_user"),
+        "PASSWORD": os.environ.get("POSTGRES_PASSWORD", "changeme"),
+        "HOST": os.environ.get("POSTGRES_HOST", "db"),
+        "PORT": os.environ.get("POSTGRES_PORT", "5433"),
     }
 }
+
 # WhiteNoise
 # ------------------------------------------------------------------------------
 # http://whitenoise.evans.io/en/latest/django.html#using-whitenoise-in-development
@@ -81,5 +95,7 @@ INSTALLED_APPS += ["django_extensions"]
 CELERY_TASK_ALWAYS_EAGER = True
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html#task-eager-propagates
 CELERY_TASK_EAGER_PROPAGATES = True
+
+
 # Your stuff...
 # ------------------------------------------------------------------------------

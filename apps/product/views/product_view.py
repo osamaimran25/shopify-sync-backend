@@ -2,13 +2,13 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authentication import BasicAuthentication
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from .services.product_service import ProductService
-from .models import Product
+from rest_framework.permissions import IsAuthenticated
+
+from apps.product.models import Product
+from apps.product.services import ProductService
 
 
 class ProductListCreateAPIView(APIView):
-    """GET: list products with filtering. POST: create new product."""
     authentication_classes = [BasicAuthentication]
     permission_classes = [IsAuthenticated]
 
