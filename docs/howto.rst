@@ -4,13 +4,14 @@ How To - Project Documentation
 Get Started
 ----------------------------------------------------------------------
 
-Documentation can be written as rst files in `shopify_sync_backend/docs`.
+Documentation can be written as rst files in `synch_backend/docs`.
 
 
-To build and serve docs, use the commands::
+To build and serve docs, use the command::
 
-    docker compose -f docker-compose.local.yml up docs
+    make livehtml
 
+from inside the `synch_backend/docs` directory.
 
 
 Changes to files in `docs/_source` will be picked up and reloaded automatically.

@@ -1,7 +1,7 @@
 services:
   docs:
-    image: shopify_sync_backend_local_docs
-    container_name: shopify_sync_backend_local_docs
+    image: synch_backend_local_docs
+    container_name: synch_backend_local_docs
     build:
       context: .
       dockerfile: ./compose/local/docs/Dockerfile
@@ -10,7 +10,7 @@ services:
     volumes:
       - ./docs:/docs:z
       - ./config:/app/config:z
-      - ./shopify_sync_backend:/app/shopify_sync_backend:z
+      - ./synch_backend:/app/synch_backend:z
     ports:
       - '9000:9000'
     command: /start-docs

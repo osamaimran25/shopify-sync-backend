@@ -1,88 +1,210 @@
-# shopify-sync-backend
+# Shopify-Integrated Django Backend
 
-Behold My Awesome Project!
+A friendly, end-to-end starter project using Django + DRF, Celery, Redis, and PostgreSQL—built to manage products, process Shopify webhooks, and run nightly import/report tasks.
 
-[![Built with Cookiecutter Django](https://img.shields.io/badge/built%20with-Cookiecutter%20Django-ff69b4.svg?logo=cookiecutter)](https://github.com/cookiecutter/cookiecutter-django/)
-[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+---
 
-License: MIT
+## 🚀 Features
 
-## Settings
+- CRUD API for products: name, SKU, price, quantity, last_updated  
+- Filtering & search by name, SKU, price, quantity  
+- BasicAuth + group-based permissions  
+- Shopify webhook endpoint (HMAC verification + inventory updates)  
+- Celery task chain (CSV import → validate/update → email report)  
+- Admin customizations: list filters, search, bulk-price actions  
+- Docker-first for easy local setup  
 
-Moved to [settings](https://cookiecutter-django.readthedocs.io/en/latest/1-getting-started/settings.html).
+---
 
-## Basic Commands
+## 🛠️ Tech Stack
 
-### Setting Up Your Users
+- Python 3.12  
+- Django & Django REST Framework  
+- Celery & Redis  
+- PostgreSQL  
+- Docker & Docker Compose  
+- pytest for testing  
 
-- To create a **normal user account**, just go to Sign Up and fill out the form. Once you submit it, you'll see a "Verify Your E-mail Address" page. Go to your console to see a simulated email verification message. Copy the link into your browser. Now the user's email should be verified and ready to go.
+---
 
-- To create a **superuser account**, use this command:
+## 📁 Project Structure
 
-      $ python manage.py createsuperuser
-
-For convenience, you can keep your normal user logged in on Chrome and your superuser logged in on Firefox (or similar), so that you can see how the site behaves for both kinds of users.
-
-### Type checks
-
-Running type checks with mypy:
-
-    $ mypy shopify_sync_backend
-
-### Test coverage
-
-To run the tests, check your test coverage, and generate an HTML coverage report:
-
-    $ coverage run -m pytest
-    $ coverage html
-    $ open htmlcov/index.html
-
-#### Running tests with pytest
-
-    $ pytest
-
-### Live reloading and Sass CSS compilation
-
-Moved to [Live reloading and SASS compilation](https://cookiecutter-django.readthedocs.io/en/latest/2-local-development/developing-locally.html#using-webpack-or-gulp).
-
-### Celery
-
-This app comes with Celery.
-
-To run a celery worker:
-
-```bash
-cd shopify_sync_backend
-celery -A config.celery_app worker -l info
+```
+.
+├── config/
+│   ├── settings/
+│   │   ├── base.py
+│   │   ├── local.py
+│   │   └── prod.py
+│   └── wsgi.py
+├── products/
+│   ├── models.py
+│   ├── serializers.py
+│   ├── views.py
+│   ├── urls.py
+│   └── services/
+│       └── product_service.py
+├── requirements.txt
+├── Dockerfile
+├── docker-compose.yml
+├── .env.example
+└── README.md
 ```
 
-Please note: For Celery's import magic to work, it is important _where_ the celery commands are run. If you are in the same folder with _manage.py_, you should be right.
+---
 
-To run [periodic tasks](https://docs.celeryq.dev/en/stable/userguide/periodic-tasks.html), you'll need to start the celery beat scheduler service. You can start it as a standalone process:
+## 🔧 Prerequisites
 
-```bash
-cd shopify_sync_backend
-celery -A config.celery_app beat
+- Docker ≥ 20.10  
+- Docker Compose ≥ 1.29  
+- A UNIX-style shell (macOS/Linux) or WSL/PowerShell on Windows  
+
+---
+
+## 🛠️ Getting Started
+
+1. **Clone the repo**  
+   ```bash
+   git clone https://github.com/your-org/shopify-backend.git
+   cd shopify-backend
+   ```
+
+2. **Copy & configure environment**  
+   ```bash
+   cp .env.example .env
+   # - Set DJANGO_SECRET_KEY: openssl rand -hex 32
+   # - Choose a strong POSTGRES_PASSWORD
+   # - For dev, keep DJANGO_DEBUG=True
+   ```
+
+3. **Build & launch**  
+   ```bash
+   docker-compose up --build -d
+   ```
+   Services started:
+   - db (PostgreSQL)  
+   - redis (Broker & result backend)  
+   - web (Django + Gunicorn)  
+   - celery (Worker)  
+   - celery-beat (Scheduler)  
+
+4. **Initialize database & create superuser**  
+   ```bash
+   docker-compose exec web python manage.py migrate
+   docker-compose exec web python manage.py createsuperuser
+   ```
+
+5. **Browse the app**  
+   - API root: http://localhost:8000/api/  
+   - Admin panel: http://localhost:8000/admin/  
+
+---
+
+## ⚙️ Development Workflow
+
+- **Code changes** auto-reload via volume mounts.  
+- **Migrations**  
+  ```bash
+  docker-compose exec web python manage.py makemigrations
+  docker-compose exec web python manage.py migrate
+  ```
+- **Run tests**  
+  ```bash
+  docker-compose exec web pytest
+  ```
+- **Shell**  
+  ```bash
+  docker-compose exec web python manage.py shell
+  ```
+- **Logs**  
+  ```bash
+  docker-compose logs -f web
+  ```
+
+---
+
+## 🔑 Environment Variables
+
+Copy `.env.example` to `.env`:
+
+```dotenv
+DJANGO_SECRET_KEY=your-secret-key
+DJANGO_DEBUG=True
+DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1
+
+POSTGRES_DB=shopify_db
+POSTGRES_USER=shopify_user
+POSTGRES_PASSWORD=changeme
+POSTGRES_HOST=db
+POSTGRES_PORT=5432
+
+REDIS_URL=redis://redis:6379/0
+CELERY_BROKER_URL=${REDIS_URL}
+CELERY_RESULT_BACKEND=${REDIS_URL}
 ```
 
-or you can embed the beat service inside a worker with the `-B` option (not recommended for production use):
+> The Postgres image auto-creates the database & user on first start, storing data in the `postgres_data` volume.
+
+---
+
+## 🐳 Docker Services
+
+- **db**: postgres:15  
+- **redis**: redis:7  
+- **web**: Django + Gunicorn  
+- **celery**: Celery worker  
+- **celery-beat**: Scheduler  
+
+Volume:
+
+- `postgres_data` persists database between restarts.
+
+---
+
+## 🌐 API & Admin
+
+- Endpoints under `/api/`  
+- Shopify webhook at `/webhook/`  
+- Admin filters on SKU, name, last_updated  
+- Bulk-price update action
+
+---
+
+## ✅ Testing
+
+Run tests:
 
 ```bash
-cd shopify_sync_backend
-celery -A config.celery_app worker -B -l info
+docker-compose exec web pytest
 ```
 
-### Sentry
+---
 
-Sentry is an error logging aggregator service. You can sign up for a free account at <https://sentry.io/signup/?code=cookiecutter> or download and host it yourself.
-The system is set up with reasonable defaults, including 404 logging and integration with the WSGI application.
+## 🤝 Contributing
 
-You must set the DSN url in production.
+1. Fork & branch:
+   ```bash
+   git checkout -b feature/your-feature
+   ```
+2. Implement:
+   - Extend serializers for validation only  
+   - Update `ProductService`  
+   - Wire views & URLs  
+   - Write tests
+3. Commit & PR:
+   ```bash
+   git add .
+   git commit -m "Add X"
+   git push origin feature/your-feature
+   ```
+4. Open PR & request review.
 
-## Deployment
+---
 
-The following details how to deploy this application.
+## 📄 License
 
-### Docker
+MIT License. See LICENSE for details.
 
-See detailed [cookiecutter-django Docker documentation](https://cookiecutter-django.readthedocs.io/en/latest/3-deployment/deployment-with-docker.html).
+---
+
+🎉 **Welcome!** Dive in, ask questions, and happy coding!
