@@ -10,7 +10,11 @@ if "%SPHINXBUILD%" == "" (
 )
 set SOURCEDIR=_source
 set BUILDDIR=_build
+<<<<<<< HEAD
+set APP=..\shopify_sync_backend
+=======
 set APP=..\synch_backend
+>>>>>>> df22a06b37407ac0c1e9773f7ff916f345cfe58f
 
 if "%1" == "" goto html
 

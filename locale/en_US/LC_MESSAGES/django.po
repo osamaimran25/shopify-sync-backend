@@ -1,6 +1,12 @@
+<<<<<<< HEAD
+# Translations for the shopify-sync-backend project
+# Copyright (C) 2025 Osama
+# Osama <osama@example.com>, 2025.
+=======
 # Translations for the synch_backend project
 # Copyright (C) 2025 Osama
 # Osama <osamaimran25@gmail.com>, 2025.
+>>>>>>> df22a06b37407ac0c1e9773f7ff916f345cfe58f
 #
 #, fuzzy
 msgid ""
